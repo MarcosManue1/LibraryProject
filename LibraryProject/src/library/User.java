@@ -1,9 +1,11 @@
 package library;
 
+import exceptions.InvalidUserException;
 import java.time.LocalDate;
 
 public class User {
 
+	private static final Exception InvalidUserException = null;
 	private String name;
 	private String email;
 	private String memberNumber;
@@ -11,12 +13,8 @@ public class User {
 	private boolean sancionated;
 	private LocalDate sanctionEndDate;
 	
-	public User(String name, String email, String memberNumber, LocalDate registrationDate) {
+	public User(String name, String email, String memberNumber, LocalDate registrationDate) throws InvalidUserException{
 		super();
-		
-		if(name!="J") {
-			
-		}
 		
 		this.name = name;
 		this.email = email;
@@ -57,25 +55,28 @@ public class User {
 		return email;
 	}
 
-	public void setEmail(String email) {
-		String reg = "(a-zA-Z),(a-zA-Z)0(a-zA-Z),(a-zA-Z)";
-	try {	
-		if(email.equals(reg)) {
+	public void setEmail(String email) throws InvalidUserException {
+		String reg = "(a-zA-Z),(a-zA-Z)0(a-zA-Z),(a-zA-Z)";	
+		if(email.matches(reg)) {
 			this.email = email;
 		}else {
-			this.email = "ERROR";
+			throw new InvalidUserException("Email not valid");
 		}
-	}catch(Exception InvalidUserException) {
-			
-		}
+	
 	}
 
 	public String getMemberNumber() {
 		return memberNumber;
 	}
 
-	public void setMemberNumber(String memberNumber) {
-		this.memberNumber = memberNumber;
+	public void setMemberNumber(String memberNumber)throws InvalidUserException{
+		String reg="SOC[0-9]{5}";
+		if(memberNumber.matches(reg)) {
+			this.memberNumber = memberNumber;
+		}else {
+			throw new InvalidUserException("Member number not valid");
+		}
+		
 	}
 
 	public LocalDate getRegistrationDate() {
