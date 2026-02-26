@@ -1,5 +1,8 @@
 package exceptions;
 
-public class InvalidUserException {
+public class InvalidUserException extends Exception{
 
+	public InvalidUserException(){
+		
+	}
 }
