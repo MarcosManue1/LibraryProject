@@ -23,7 +23,7 @@ public class User {
             throw new InvalidUserException("Invalid email format");
         }
 
-        if (memberNumber == null || !memberNumber.matches("SOC\\d{5}")) {
+        if (memberNumber == null || !memberNumber.matches("SOC[0-9]{5}")) {
             throw new InvalidUserException("Member number must follow format SOC + 5 digits");
         }
 

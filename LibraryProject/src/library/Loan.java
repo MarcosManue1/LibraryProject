@@ -2,7 +2,7 @@ package library;
 
 import java.time.LocalDate;
 import java.util.Scanner;
-
+import exceptions.InvalidLoanException;
 import exceptions.InvalidUserException;
 
 public class Loan extends User{
@@ -14,15 +14,40 @@ public class Loan extends User{
 	private LocalDate dueDate;
 	private LocalDate actualReturnDate;
 
-	public Loan(String name, String email, String memberNumber, LocalDate registrationDate) throws InvalidUserException {
+	public Loan(String name, String email, String memberNumber, LocalDate registrationDate) throws InvalidLoanException, InvalidUserException {
 		super(name, email, memberNumber, registrationDate);
+		
+		this.bookCode=bookCode;
+		this.bookTitle=bookTitle;
+		this.member=member;
+		this.loanDate=loanDate;
+		this.dueDate=dueDate;
+		this.actualReturnDate=actualReturnDate;
 		
 	}
 	
-	public void registerReturn(LocalDate date) {
+	public void registerReturn(LocalDate date) throws InvalidLoanException{
 		Scanner keyboard = new Scanner(System.in);
 		System.out.println("Enter the date when the book was returned: ");
 		String returnData=keyboard.nextLine();
+		date=LocalDate.parse(returnData);
+		if(date==null) {
+			throw new InvalidLoanException("Invalid, the date has not been introduced");
+		}else if(date.isBefore(loanDate)) {
+			throw new InvalidLoanException("Invalid, the date is not correct");
+		}else {
+			setActualReturnDate(date);
+		}
+	}
+	
+	public int calculateDelayDays() {
+		int dateDiff;
+		if(actualReturnDate==null) {
+			dateDiff=dueDate.compareTo(LocalDate.now());
+		}else {
+			dateDiff=dueDate.compareTo(actualReturnDate);
+		}
+		return dateDiff;
 	}
 
 	/**
