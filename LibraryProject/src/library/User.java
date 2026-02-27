@@ -5,41 +5,74 @@ import java.time.LocalDate;
 
 public class User {
 
-	private static final Exception InvalidUserException = null;
 	private String name;
 	private String email;
 	private String memberNumber;
 	private LocalDate registrationDate;
-	private boolean sancionated;
+	private boolean sanctioned;
 	private LocalDate sanctionEndDate;
 	
 	public User(String name, String email, String memberNumber, LocalDate registrationDate) throws InvalidUserException{
 		super();
 		
+		if (name == null || name.isBlank()) {
+            throw new InvalidUserException("Name cannot be null or empty");
+        }
+
+        if (email == null || !email.contains("@") || !email.contains(".")) {
+            throw new InvalidUserException("Invalid email format");
+        }
+
+        if (memberNumber == null || !memberNumber.matches("SOC\\d{5}")) {
+            throw new InvalidUserException("Member number must follow format SOC + 5 digits");
+        }
+
+        if (registrationDate == null) {
+            throw new InvalidUserException("Registration date cannot be null");
+        }
+        
+        setEmail(email);
+        setMemberNumber(memberNumber);
+		
 		this.name = name;
 		this.email = email;
 		this.memberNumber = memberNumber;
 		this.registrationDate = registrationDate;
+		this.sanctioned = false;
+	    this.sanctionEndDate = null;
 		
 	}
 	
 	public void Sanction(int days) {
 		
-		setSancionated(false);
+		if (days > 0) {
+            this.sanctioned = true;
+            this.sanctionEndDate = LocalDate.now().plusDays(days);
+		}
 	}
-	
-	public static void liftSanction() {
+	public void liftSanction() {
 		
+		this.sanctioned = false;
+        this.sanctionEndDate = null;
 	}
 
-	public static boolean isSanctioned() {
-		return true;
+	public boolean isSanctioned() {
+		if (!sanctioned) {
+            return false;
+        }
+
+        if (LocalDate.now().isAfter(sanctionEndDate)) {
+            liftSanction(); 
+            return false;
+        }
+
+        return true;
 	}
 	
 	@Override
 	public String toString() {
 		return "User [name=" + name + ", email=" + email + ", memberNumber=" + memberNumber + ", registrationDate="
-				+ registrationDate + ", sancionated=" + sancionated + ", sanctionEndDate=" + sanctionEndDate + "]";
+				+ registrationDate + ", sancionated=" + sanctioned + ", sanctionEndDate=" + sanctionEndDate + "]";
 	}
 
 	public String getName() {
@@ -56,7 +89,8 @@ public class User {
 	}
 
 	public void setEmail(String email) throws InvalidUserException {
-		String reg = "(a-zA-Z),(a-zA-Z)0(a-zA-Z),(a-zA-Z)";	
+		String reg = "[a-zA-Z].\\w+";
+		
 		if(email.matches(reg)) {
 			this.email = email;
 		}else {
@@ -88,11 +122,11 @@ public class User {
 	}
 
 	public boolean isSancionated() {
-		return sancionated;
+		return sanctioned;
 	}
 
 	public void setSancionated(boolean sancionated) {
-		this.sancionated = sancionated;
+		this.sanctioned = sancionated;
 	}
 
 	public LocalDate getSanctionEndDate() {
@@ -102,7 +136,5 @@ public class User {
 	public void setSanctionEndDate(LocalDate sanctionEndDate) {
 		this.sanctionEndDate = sanctionEndDate;
 	}
-	
-	
 	
 }
