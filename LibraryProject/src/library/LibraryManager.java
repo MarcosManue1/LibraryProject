@@ -36,7 +36,7 @@ public class LibraryManager{
 			users.add(newUser);
 		}
 	}
-	
+	//Methods
 	public void registerLoan(Loan newLoan) throws InvalidLoanException{
 		Scanner keyboard = new Scanner(System.in);
 		System.out.println("Enter the book code: ");
