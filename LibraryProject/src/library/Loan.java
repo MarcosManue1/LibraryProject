@@ -38,12 +38,31 @@ public class Loan{
 	        this.actualReturnDate = date;
 	    }
 
-	    // Calcula los días de retraso. Si aún no se ha devuelto, usa la fecha actual.
-	    // Devuelve 0 si no hay retraso.
+	    // Si el libro ya fue devuelto usamos la fecha de devolución.
+	    // Si no ha sido devuelto, usamos la fecha actual.
 	    public int calculateDelayDays() {
-	        LocalDate referenceDate = (actualReturnDate != null) ? actualReturnDate : LocalDate.now();
-	        long delay = ChronoUnit.DAYS.between(dueDate, referenceDate);
-	        return (int) Math.max(0, delay);
+	    	
+	    	LocalDate referenceDate;
+
+	        if (actualReturnDate != null) {
+	            referenceDate = actualReturnDate;
+	        } else {
+	            referenceDate = LocalDate.now();
+	        }
+
+	        // Convertimos ambas fechas a número de días desde 1970
+	        // y calculamos la diferencia.
+	        
+	        int delay = (int) (referenceDate.toEpochDay() - dueDate.toEpochDay());
+
+	        // Si el resultado es negativo significa que no hay retraso,
+	        // por lo tanto devolvemos 0.
+	        
+	        if (delay < 0) {
+	            return 0;
+	        }
+
+	        return delay;
 	    }
 
 	    // Devuelve true si la fecha de vencimiento ya ha pasado (el libro está vencido)

@@ -9,12 +9,12 @@ import exceptions.InvalidUserException;
 import exceptions.RepeatedUserException;
 
 public class LibraryManager{
-
 	
 	ArrayList<User> users=new ArrayList<User>();
 	ArrayList<Loan> loans=new ArrayList<Loan>();
 	private int userCount=0;
 	private int loanCount=0;
+	
 	
 	public void registerUser(User newUser) throws InvalidUserException, RepeatedUserException{
 		Scanner keyboard = new Scanner (System.in);
@@ -36,7 +36,7 @@ public class LibraryManager{
 			users.add(newUser);
 		}
 	}
-	//Methods
+
 	public void registerLoan(Loan newLoan) throws InvalidLoanException{
 		Scanner keyboard = new Scanner(System.in);
 		System.out.println("Enter the book code: ");
@@ -44,8 +44,17 @@ public class LibraryManager{
 		System.out.println("Enter the book title: ");
 		String bookTitle=keyboard.nextLine();
 		System.out.println("Enter the user: ");
-		String user=keyboard.nextLine();
-		users.
+		String member=keyboard.nextLine();
+		int index=users.indexOf(member);
+		User libraryMember= users.get(index);
+		System.out.println("Enter the loan date: ");
+		String date=keyboard.nextLine();
+		LocalDate loanDate=LocalDate.parse(date);
+		
+		loans.add(newLoan=new Loan(bookCode, libraryMember, bookTitle, loanDate));
+		
 	}
+	
+	
 }
 
