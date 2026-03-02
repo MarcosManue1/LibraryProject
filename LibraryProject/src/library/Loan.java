@@ -1,137 +1,170 @@
 package library;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.Scanner;
 import exceptions.InvalidLoanException;
 import exceptions.InvalidUserException;
 
-public class Loan extends User{
+public class Loan{
 	
-	private String bookCode;
-	private String bookTitle;
-	private User member;
-	private LocalDate loanDate;
-	private LocalDate dueDate;
-	private LocalDate actualReturnDate;
+	 private String bookCode;
+	    private String bookTitle;
+	    private User member;
+	    private LocalDate loanDate;
+	    private LocalDate dueDate;
+	    private LocalDate actualReturnDate; // null si el libro no ha sido devuelto aún
 
-	public Loan(String name, String email, String memberNumber, LocalDate registrationDate) throws InvalidLoanException, InvalidUserException {
-		super(name, email, memberNumber, registrationDate);
-		
-		this.bookCode=bookCode;
-		this.bookTitle=bookTitle;
-		this.member=member;
-		this.loanDate=loanDate;
-		this.dueDate=dueDate;
-		this.actualReturnDate=actualReturnDate;
-		
-	}
-	
-	public void registerReturn(LocalDate date) throws InvalidLoanException{
-		Scanner keyboard = new Scanner(System.in);
-		System.out.println("Enter the date when the book was returned: ");
-		String returnData=keyboard.nextLine();
-		date=LocalDate.parse(returnData);
-		if(date==null) {
-			throw new InvalidLoanException("Invalid, the date has not been introduced");
-		}else if(date.isBefore(loanDate)) {
-			throw new InvalidLoanException("Invalid, the date is not correct");
-		}else {
-			setActualReturnDate(date);
+	    // Constructor: recibe bookCode, usuario, título y fecha de préstamo
+	    public Loan(String bookCode, User member, String bookTitle, LocalDate loanDate)
+	            throws InvalidLoanException {
+
+	        setBookCode(bookCode);
+	        setBookTitle(bookTitle);
+	        this.member = member;
+	        setLoanDate(loanDate);
+	        setDueDate(dueDate);
+	        this.actualReturnDate = null;
+	    }
+
+	    // Registra la devolución del libro
+	    public void registerReturn(LocalDate date) throws InvalidLoanException {
+	        if (date == null) {
+	            throw new InvalidLoanException("La fecha de devolución no puede ser nula.");
+	        }
+	        if (date.isBefore(loanDate)) {
+	            throw new InvalidLoanException("La fecha de devolución no puede ser anterior a la fecha de préstamo.");
+	        }
+	        this.actualReturnDate = date;
+	    }
+
+	    // Calcula los días de retraso. Si aún no se ha devuelto, usa la fecha actual.
+	    // Devuelve 0 si no hay retraso.
+	    public int calculateDelayDays() {
+	        LocalDate referenceDate = (actualReturnDate != null) ? actualReturnDate : LocalDate.now();
+	        long delay = ChronoUnit.DAYS.between(dueDate, referenceDate);
+	        return (int) Math.max(0, delay);
+	    }
+
+	    // Devuelve true si la fecha de vencimiento ya ha pasado (el libro está vencido)
+	    public boolean isOverdue() {
+	        return LocalDate.now().isAfter(dueDate);
+	    }
+
+	    @Override
+	    public String toString() {
+	        return "Loan [bookCode=" + bookCode + ", bookTitle=" + bookTitle
+	                + ", member=" + member.getName() + ", loanDate=" + loanDate
+	                + ", dueDate=" + dueDate + ", actualReturnDate=" + actualReturnDate + "]";
+	    }
+
+		/**
+		 * @return the bookCode
+		 */
+		public String getBookCode() {
+			return bookCode;
 		}
-	}
-	
-	public int calculateDelayDays() {
-		int dateDiff;
-		if(actualReturnDate==null) {
-			dateDiff=dueDate.compareTo(LocalDate.now());
-		}else {
-			dateDiff=dueDate.compareTo(actualReturnDate);
+
+		/**
+		 * @param bookCode the bookCode to set
+		 * @throws InvalidLoanException 
+		 */
+		public void setBookCode(String bookCode) throws InvalidLoanException {
+			// Validar formato bookCode: 3 letras mayúsculas + 4 dígitos (ej: LIB0001)
+			if (bookCode == null || !bookCode.matches("[A-Z]{3}[0-9]{4}")) {
+	            throw new InvalidLoanException("El código de libro no es válido. Formato: 3 letras mayúsculas + 4 dígitos (ej: LIB0001).");
+			}else {
+				this.bookCode=bookCode;
+			}
+			
 		}
-		return dateDiff;
-	}
+			
 
-	/**
-	 * @return the bookCode
-	 */
-	public String getBookCode() {
-		return bookCode;
-	}
+		/**
+		 * @return the bookTitle
+		 */
+		public String getBookTitle() {
+			return bookTitle;
+		}
 
-	/**
-	 * @param bookCode the bookCode to set
-	 */
-	public void setBookCode(String bookCode) {
-		this.bookCode = bookCode;
-	}
+		/**
+		 * @param bookTitle the bookTitle to set
+		 * @throws InvalidLoanException 
+		 */
+		public void setBookTitle(String bookTitle) throws InvalidLoanException {
+			 // Validar título
+	        if (bookTitle == null || bookTitle.isBlank()) {
+	            throw new InvalidLoanException("El título del libro no puede estar vacío.");
+	        }else {
+	        	this.bookTitle=bookTitle;
+	        }
+		}
 
-	/**
-	 * @return the bookTitle
-	 */
-	public String getBookTitle() {
-		return bookTitle;
-	}
+		/**
+		 * @return the member
+		 */
+		public User getMember() {
+			return member;
+		}
 
-	/**
-	 * @param bookTitle the bookTitle to set
-	 */
-	public void setBookTitle(String bookTitle) {
-		this.bookTitle = bookTitle;
-	}
+		/**
+		 * @param member the member to set
+		 */
+		public void setMember(User member) {
+			this.member = member;
+		}
 
-	/**
-	 * @return the member
-	 */
-	public User getMember() {
-		return member;
-	}
+		/**
+		 * @return the loanDate
+		 */
+		public LocalDate getLoanDate() {
+			return loanDate;
+		}
 
-	/**
-	 * @param member the member to set
-	 */
-	public void setMember(User member) {
-		this.member = member;
-	}
+		/**
+		 * @param loanDate the loanDate to set
+		 * @throws InvalidLoanException 
+		 */
+		public void setLoanDate(LocalDate loanDate) throws InvalidLoanException {
+			// Validar fecha: no puede ser nula ni estar en el futuro
+	        if (loanDate == null) {
+	            throw new InvalidLoanException("La fecha de préstamo no puede ser nula.");
+	        }else if(loanDate.isAfter(LocalDate.now())) {
+	        
+	            throw new InvalidLoanException("La fecha de préstamo no puede ser una fecha futura.");
+	        }else {
+	        	this.loanDate=loanDate;
+	        }
+		}
 
-	/**
-	 * @return the loanDate
-	 */
-	public LocalDate getLoanDate() {
-		return loanDate;
-	}
+		/**
+		 * @return the dueDate
+		 */
+		public LocalDate getDueDate() {
+			return dueDate;
+		}
 
-	/**
-	 * @param loanDate the loanDate to set
-	 */
-	public void setLoanDate(LocalDate loanDate) {
-		this.loanDate = loanDate;
-	}
+		/**
+		 * @param newDate the dueDate to set
+		 */
+		public void setDueDate(LocalDate newDate) {
+			this.dueDate = newDate.plusDays(14);
+		}
 
-	/**
-	 * @return the dueDate
-	 */
-	public LocalDate getDueDate() {
-		return dueDate;
-	}
+		/**
+		 * @return the actualReturnDate
+		 */
+		public LocalDate getActualReturnDate() {
+			return actualReturnDate;
+		}
 
-	/**
-	 * @param dueDate the dueDate to set
-	 */
-	public void setDueDate(LocalDate dueDate) {
-		this.dueDate = dueDate;
-	}
+		/**
+		 * @param actualReturnDate the actualReturnDate to set
+		 */
+		public void setActualReturnDate(LocalDate actualReturnDate) {
+			this.actualReturnDate = actualReturnDate;
+		}
 
-	/**
-	 * @return the actualReturnDate
-	 */
-	public LocalDate getActualReturnDate() {
-		return actualReturnDate;
-	}
-
-	/**
-	 * @param actualReturnDate the actualReturnDate to set
-	 */
-	public void setActualReturnDate(LocalDate actualReturnDate) {
-		this.actualReturnDate = actualReturnDate;
-	}
+	    
 	
 }

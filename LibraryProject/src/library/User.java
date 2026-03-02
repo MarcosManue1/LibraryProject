@@ -14,29 +14,11 @@ public class User {
 	
 	public User(String name, String email, String memberNumber, LocalDate registrationDate) throws InvalidUserException{
 		super();
-		
-		if (name == null || name.isBlank()) {
-            throw new InvalidUserException("Name cannot be null or empty");
-        }
-
-        if (email == null || !email.contains("@") || !email.contains(".")) {
-            throw new InvalidUserException("Invalid email format");
-        }
-
-        if (memberNumber == null || !memberNumber.matches("SOC[0-9]{5}")) {
-            throw new InvalidUserException("Member number must follow format SOC + 5 digits");
-        }
-
-        if (registrationDate == null) {
-            throw new InvalidUserException("Registration date cannot be null");
-        }
         
         setEmail(email);
         setMemberNumber(memberNumber);
 		
 		this.name = name;
-		this.email = email;
-		this.memberNumber = memberNumber;
 		this.registrationDate = registrationDate;
 		this.sanctioned = false;
 	    this.sanctionEndDate = null;
