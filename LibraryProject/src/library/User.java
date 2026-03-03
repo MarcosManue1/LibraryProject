@@ -12,6 +12,7 @@ public class User {
 	private boolean sanctioned;
 	private LocalDate sanctionEndDate;
 	
+	// Constructor: creates a new user and validates email and member number
 	public User(String name, String email, String memberNumber, LocalDate registrationDate) throws InvalidUserException{
 		super();
         
@@ -24,20 +25,22 @@ public class User {
 	    this.sanctionEndDate = null;
 		
 	}
-	
-	public void Sanction(int days) {
+	 // Applies a sanction for a number of days
+	public void sanction(int days) {
 		
 		if (days > 0) {
             this.sanctioned = true;
             this.sanctionEndDate = LocalDate.now().plusDays(days);
 		}
 	}
+	// Removes the current sanction
 	public void liftSanction() {
 		
 		this.sanctioned = false;
         this.sanctionEndDate = null;
 	}
-
+	// Checks if the user is currently sanctioned
+    // If the sanction has expired, it is removed automatically
 	public boolean isSanctioned() {
 		if (!sanctioned) {
             return false;
@@ -69,7 +72,7 @@ public class User {
 	public String getEmail() {
 		return email;
 	}
-
+	// Validates and sets email
 	public void setEmail(String email) throws InvalidUserException {
 		String reg = "[a-zA-Z].\\w+";
 		
@@ -84,7 +87,7 @@ public class User {
 	public String getMemberNumber() {
 		return memberNumber;
 	}
-
+	 // Validates and sets member number (SOC + 5 digits)
 	public void setMemberNumber(String memberNumber)throws InvalidUserException{
 		String reg="SOC[0-9]{5}";
 		if(memberNumber.matches(reg)) {

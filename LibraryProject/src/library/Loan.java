@@ -8,14 +8,15 @@ import exceptions.InvalidUserException;
 
 public class Loan{
 	
-	 private String bookCode;
+	 String bookCode;
 	    private String bookTitle;
 	    private User member;
 	    private LocalDate loanDate;
 	    private LocalDate dueDate;
-	    private LocalDate actualReturnDate; // null si el libro no ha sido devuelto aún
+	    private LocalDate actualReturnDate; 
 
-	    // Constructor: recibe bookCode, usuario, título y fecha de préstamo
+	    // Constructor: receives bookCode, user, title, and loan date
+	    
 	    public Loan(String bookCode, User member, String bookTitle, LocalDate loanDate)
 	            throws InvalidLoanException {
 
@@ -23,26 +24,26 @@ public class Loan{
 	        setBookTitle(bookTitle);
 	        this.member = member;
 	        setLoanDate(loanDate);
-	        setDueDate(dueDate);
+	        setDueDate(dueDate); // due date = loanDate + 14 days
 	        this.actualReturnDate = null;
 	    }
 
-	    // Registra la devolución del libro
+	    // Registers the return of the book
 	    public void registerReturn(LocalDate date) throws InvalidLoanException {
 	        if (date == null) {
-	            throw new InvalidLoanException("La fecha de devolución no puede ser nula.");
+	            throw new InvalidLoanException("Return date cannot be null.");
 	        }
 	        if (date.isBefore(loanDate)) {
-	            throw new InvalidLoanException("La fecha de devolución no puede ser anterior a la fecha de préstamo.");
+	            throw new InvalidLoanException("Return date cannot be before loan date.");
 	        }
 	        this.actualReturnDate = date;
 	    }
 
-	    // Si el libro ya fue devuelto usamos la fecha de devolución.
-	    // Si no ha sido devuelto, usamos la fecha actual.
+	    // If the book has already been returned, we use the return date.
+	    // If it has not been returned, we use today's date.
 	    public int calculateDelayDays() {
-	    	
-	    	LocalDate referenceDate;
+
+	        LocalDate referenceDate;
 
 	        if (actualReturnDate != null) {
 	            referenceDate = actualReturnDate;
@@ -50,22 +51,16 @@ public class Loan{
 	            referenceDate = LocalDate.now();
 	        }
 
-	        // Convertimos ambas fechas a número de días desde 1970
-	        // y calculamos la diferencia.
-	        
-	        int delay = (int) (referenceDate.toEpochDay() - dueDate.toEpochDay());
-
-	        // Si el resultado es negativo significa que no hay retraso,
-	        // por lo tanto devolvemos 0.
-	        
-	        if (delay < 0) {
+	        // If the reference date is not after dueDate, there is no delay
+	        if (!referenceDate.isAfter(dueDate)) {
 	            return 0;
 	        }
 
-	        return delay;
+	        // Return the number of delayed days
+	        return (int) dueDate.until(referenceDate).getDays();
 	    }
 
-	    // Devuelve true si la fecha de vencimiento ya ha pasado (el libro está vencido)
+	    // Returns true if the due date has passed (the book is overdue)
 	    public boolean isOverdue() {
 	        return LocalDate.now().isAfter(dueDate);
 	    }
@@ -77,113 +72,72 @@ public class Loan{
 	                + ", dueDate=" + dueDate + ", actualReturnDate=" + actualReturnDate + "]";
 	    }
 
-		/**
-		 * @return the bookCode
-		 */
-		public String getBookCode() {
-			return bookCode;
-		}
+	    public String getBookCode() {
+	        return bookCode;
+	    }
 
-		/**
-		 * @param bookCode the bookCode to set
-		 * @throws InvalidLoanException 
-		 */
-		public void setBookCode(String bookCode) throws InvalidLoanException {
-			// Validar formato bookCode: 3 letras mayúsculas + 4 dígitos (ej: LIB0001)
-			if (bookCode == null || !bookCode.matches("[A-Z]{3}[0-9]{4}")) {
-	            throw new InvalidLoanException("El código de libro no es válido. Formato: 3 letras mayúsculas + 4 dígitos (ej: LIB0001).");
-			}else {
-				this.bookCode=bookCode;
-			}
-			
-		}
-			
-
-		/**
-		 * @return the bookTitle
-		 */
-		public String getBookTitle() {
-			return bookTitle;
-		}
-
-		/**
-		 * @param bookTitle the bookTitle to set
-		 * @throws InvalidLoanException 
-		 */
-		public void setBookTitle(String bookTitle) throws InvalidLoanException {
-			 // Validar título
-	        if (bookTitle == null || bookTitle.isBlank()) {
-	            throw new InvalidLoanException("El título del libro no puede estar vacío.");
-	        }else {
-	        	this.bookTitle=bookTitle;
-	        }
-		}
-
-		/**
-		 * @return the member
-		 */
-		public User getMember() {
-			return member;
-		}
-
-		/**
-		 * @param member the member to set
-		 */
-		public void setMember(User member) {
-			this.member = member;
-		}
-
-		/**
-		 * @return the loanDate
-		 */
-		public LocalDate getLoanDate() {
-			return loanDate;
-		}
-
-		/**
-		 * @param loanDate the loanDate to set
-		 * @throws InvalidLoanException 
-		 */
-		public void setLoanDate(LocalDate loanDate) throws InvalidLoanException {
-			// Validar fecha: no puede ser nula ni estar en el futuro
-	        if (loanDate == null) {
-	            throw new InvalidLoanException("La fecha de préstamo no puede ser nula.");
-	        }else if(loanDate.isAfter(LocalDate.now())) {
-	        
-	            throw new InvalidLoanException("La fecha de préstamo no puede ser una fecha futura.");
-	        }else {
-	        	this.loanDate=loanDate;
-	        }
-		}
-
-		/**
-		 * @return the dueDate
-		 */
-		public LocalDate getDueDate() {
-			return dueDate;
-		}
-
-		/**
-		 * @param newDate the dueDate to set
-		 */
-		public void setDueDate(LocalDate newDate) {
-			this.dueDate = newDate.plusDays(14);
-		}
-
-		/**
-		 * @return the actualReturnDate
-		 */
-		public LocalDate getActualReturnDate() {
-			return actualReturnDate;
-		}
-
-		/**
-		 * @param actualReturnDate the actualReturnDate to set
-		 */
-		public void setActualReturnDate(LocalDate actualReturnDate) {
-			this.actualReturnDate = actualReturnDate;
-		}
-
+	    // Validates bookCode format: 3 uppercase letters + 4 digits 
 	    
-	
+	    public void setBookCode(String bookCode) throws InvalidLoanException {
+
+	        if (bookCode == null || !bookCode.matches("[A-Z]{3}[0-9]{4}")) {
+	            throw new InvalidLoanException("Invalid book code format. Must be 3 uppercase letters + 4 digits (e.g., LIB0001).");
+	        } else {
+	            this.bookCode = bookCode;
+	        }
+	    }
+
+	    public String getBookTitle() {
+	        return bookTitle;
+	    }
+
+	    // Validates title (cannot be null or blank)
+	    public void setBookTitle(String bookTitle) throws InvalidLoanException {
+	        if (bookTitle == null || bookTitle.isBlank()) {
+	            throw new InvalidLoanException("Book title cannot be empty.");
+	        } else {
+	            this.bookTitle = bookTitle;
+	        }
+	    }
+
+	    public User getMember() {
+	        return member;
+	    }
+
+	    public void setMember(User member) {
+	        this.member = member;
+	    }
+
+	    public LocalDate getLoanDate() {
+	        return loanDate;
+	    }
+
+	    // Validates loan date: cannot be null or in the future
+	    public void setLoanDate(LocalDate loanDate) throws InvalidLoanException {
+
+	        if (loanDate == null) {
+	            throw new InvalidLoanException("Loan date cannot be null.");
+	        } else if (loanDate.isAfter(LocalDate.now())) {
+	            throw new InvalidLoanException("Loan date cannot be in the future.");
+	        } else {
+	            this.loanDate = loanDate;
+	        }
+	    }
+
+	    public LocalDate getDueDate() {
+	        return dueDate;
+	    }
+
+	    // Sets due date as 14 days after loan date
+	    public void setDueDate(LocalDate newDate) {
+	        this.dueDate = newDate.plusDays(14);
+	    }
+
+	    public LocalDate getActualReturnDate() {
+	        return actualReturnDate;
+	    }
+
+	    public void setActualReturnDate(LocalDate actualReturnDate) {
+	        this.actualReturnDate = actualReturnDate;
+	    }
 }
