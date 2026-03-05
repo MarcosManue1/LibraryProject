@@ -24,7 +24,7 @@ public class Loan{
 	        setBookTitle(bookTitle);
 	        this.member = member;
 	        setLoanDate(loanDate);
-	        setDueDate(dueDate); // due date = loanDate + 14 days
+	        setDueDate(loanDate); // due date = loanDate + 14 days
 	        this.actualReturnDate = null;
 	    }
 
@@ -43,21 +43,25 @@ public class Loan{
 	    // If it has not been returned, we use today's date.
 	    public int calculateDelayDays() {
 
-	        LocalDate referenceDate;
+	    	int days = 0;
+	    	LocalDate temp = dueDate;
+	    	LocalDate ref;
 
-	        if (actualReturnDate != null) {
-	            referenceDate = actualReturnDate;
-	        } else {
-	            referenceDate = LocalDate.now();
-	        }
+	    	// If the book has been returned, use the return date. Otherwise, use today
+	    	if (actualReturnDate != null) {
+	    	    ref = actualReturnDate;
+	    	} else {
+	    	    ref = LocalDate.now();
+	    	}
 
-	        // If the reference date is not after dueDate, there is no delay
-	        if (!referenceDate.isAfter(dueDate)) {
-	            return 0;
-	        }
+	    	// Count the days between dueDate and the reference date
+	    	while (temp.isBefore(ref)) {
+	    	    temp = temp.plusDays(1);
+	    	    days++;
+	    	}
 
-	        // Return the number of delayed days
-	        return (int) dueDate.until(referenceDate).getDays();
+	    	// Return the total delay days
+	    	return days;
 	    }
 
 	    // Returns true if the due date has passed (the book is overdue)

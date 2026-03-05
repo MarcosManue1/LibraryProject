@@ -24,6 +24,9 @@ public class MainApp {
 		 // Keep showing the menu until the user chooses to exit (option 8)
 		do {
 			
+			printMenu();
+			option=readInt();
+			
 			switch(option) {
 			case 1:
 				registerUser();
@@ -87,7 +90,6 @@ public class MainApp {
 			String memberNumber=keyboard.nextLine();
 			
 			System.out.println("Registration date: dd/MM/yyyy");
-			String date=keyboard.nextLine();
 			LocalDate registrationDate = readDate();
 
             // User constructor validates email and memberNumber via setters
@@ -95,6 +97,7 @@ public class MainApp {
 
             // registerUser checks for duplicates
             manager.registerUser(newUser);
+            
 		}catch (InvalidUserException e) {
             System.out.println("Error: " + e.getMessage());
         } catch (RepeatedUserException e) {
@@ -189,6 +192,8 @@ public class MainApp {
         }
     }
     
+    //Ahora cada vez que le doy a la opcion return book cuando pongo la fecha de regreso y esta fuera de plazo me pone que libro regresado con exito cuando no deberia. Mira en mi clase main o loan donde pueda estar el error
+    
     // Option 5: shows all loans where the book has not been returned yet
     
     private static void showActiveLoans() {
@@ -213,10 +218,10 @@ public class MainApp {
         System.out.println("\n--- Sanctioned Users ---");
 
         boolean found = false;
-        for (User u : manager.getUsers()) {
-            if (u.isSanctioned()) {
-                System.out.println(u.toString());
-                System.out.println("Sanctioned until: " + u.getSanctionEndDate());
+        for (User user : manager.getUsers()) {
+            if (user.isSanctioned()) {
+                System.out.println(user.toString());
+                System.out.println("Sanctioned until: " + user.getSanctionEndDate());
                 found = true;
             }
         }
@@ -231,13 +236,13 @@ public class MainApp {
         System.out.println("\n--- Updating sanctions ---");
 
         int count = 0;
-        for (User u : manager.getUsers()) {
+        for (User user : manager.getUsers()) {
             // If the user has a sanctionEndDate but isSanctioned() returns false,
             // it means the sanction just expired and was lifted automatically
-            if (!u.isSanctioned() && u.getSanctionEndDate() != null) {
-                System.out.println("Sanction lifted for: " + u.getName());
+            if (!user.isSanctioned() && user.getSanctionEndDate() != null) {
+                System.out.println("Sanction lifted for: " + user.getName());
                 // Clear the sanctionEndDate now that it has been processed
-                u.setSanctionEndDate(null);
+                user.setSanctionEndDate(null);
                 count++;
             }
         }
@@ -250,6 +255,7 @@ public class MainApp {
     }
  
  // Method that reads a date in dd/MM/yyyy format, keeps asking if the format is wrong
+    
     private static LocalDate readDate() {
     	
         while (true) {

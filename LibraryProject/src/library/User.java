@@ -74,9 +74,8 @@ public class User {
 	}
 	// Validates and sets email
 	public void setEmail(String email) throws InvalidUserException {
-		String reg = "[a-zA-Z].\\w+";
 		
-		if(email.matches(reg)) {
+		if(email.contains("@") && email.contains(".")) {
 			this.email = email;
 		}else {
 			throw new InvalidUserException("Email not valid");

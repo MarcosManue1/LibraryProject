@@ -32,6 +32,7 @@ public class LibraryManager{
     }
 
     // Creates and adds a new loan to the loans list
+    
     // If the book is available and the user is not sanctioned, creates the loan and adds it
     public void registerLoan(String bookCode, User member, String bookTitle, LocalDate loanDate)
             throws InvalidLoanException, SanctionedUserException, BookNotAvailableException {
